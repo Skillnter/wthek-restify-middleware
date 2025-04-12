@@ -6,6 +6,15 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 
 > 💡 What the HEK?! Need a hassle-free way to manage error responses for `http-error-kit` errors in Restify? `@wthek/restify-middleware` has got you covered!
 
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/skillnter/wthek-restify-middleware/main.yml)
+[![npm version](https://img.shields.io/npm/v/%40wthek%2Frestify-middleware?color=brightgreen)](https://www.npmjs.com/package/@wthek/restify-middleware)
+[![GitHub license](https://img.shields.io/github/license/skillnter/wthek-restify-middleware?color=brightgreen)](LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/Skillnter/wthek-restify-middleware)](https://github.com/Skillnter/wthek-restify-middleware/issues)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/f672583cdb534cfd8eb16b71249ba35c)](https://app.codacy.com/gh/Skillnter/wthek-restify-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f672583cdb534cfd8eb16b71249ba35c)](https://app.codacy.com/gh/Skillnter/wthek-restify-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+![npms.io (final)](https://img.shields.io/npms-io/maintenance-score/%40wthek%2Frestify-middleware?color=brightgreen)
+![npm](https://img.shields.io/npm/dy/%40wthek%2Frestify-middleware)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/restify-middleware/1.0.0)](https://socket.dev/npm/package/@wthek/restify-middleware/overview/1.0.0)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-121013?logo=github&logoColor=white)](https://skillnter.github.io/wthek-restify-middleware/)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA)](https://github.com/sponsors/Skillnter)
 [![Open Collective](https://img.shields.io/badge/Open%20Collective-3385FF?logo=open-collective&logoColor=white)](https://opencollective.com/skillnter)
