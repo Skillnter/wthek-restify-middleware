@@ -1,6 +1,6 @@
 {
     "name": "@wthek/restify-middleware",
-    "version": "1.0.0-beta.1",
+    "version": "1.0.0",
     "description": "Restify middleware for handling and formatting errors using http-error-kit. Ensures structured error responses with correct status codes.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

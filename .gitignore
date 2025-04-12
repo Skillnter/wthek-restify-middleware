@@ -69,3 +69,4 @@ package-lock.json
 .nyc_output/
 .eslintrc.json
 *.tsbuildinfo
+.codacy-coverage
