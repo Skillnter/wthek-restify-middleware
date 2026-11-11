@@ -14,7 +14,8 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f672583cdb534cfd8eb16b71249ba35c)](https://app.codacy.com/gh/Skillnter/wthek-restify-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![npms.io (final)](https://img.shields.io/npms-io/maintenance-score/%40wthek%2Frestify-middleware?color=brightgreen)
 ![npm](https://img.shields.io/npm/dy/%40wthek%2Frestify-middleware)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/restify-middleware/1.0.0)](https://socket.dev/npm/package/@wthek/restify-middleware/overview/1.0.0)
+![npm bundle size (version)](https://img.shields.io/bundlephobia/minzip/%40wthek%2Frestify-middleware/1.1.0)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/restify-middleware/1.1.0)](https://socket.dev/npm/package/@wthek/restify-middleware/overview/1.1.0)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-121013?logo=github&logoColor=white)](https://skillnter.github.io/wthek-restify-middleware/)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA)](https://github.com/sponsors/Skillnter)
 [![Open Collective](https://img.shields.io/badge/Open%20Collective-3385FF?logo=open-collective&logoColor=white)](https://opencollective.com/skillnter)
@@ -26,13 +27,17 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 
 -   **Official `http-error-kit` Extension** – The recommended middleware for Restify apps.
 -   **Auto-sets HTTP status codes** – Ensures the response status matches the error type.
--   **Plug-and-Play Middleware** – Just drop it before starting your server!
--   **Graceful Fallbacks** – Passes unrecognized errors to the next middleware.
+-   **Plug-and-Play Middleware** – Just attach it to `server.on('restifyError', ...)`!
+-   **`headersSent` Protection** – Prevents `ERR_HTTP_HEADERS_SENT` crashes when headers have already been sent.
+-   **Configurable Logging** – Easily enable console logging or pass a custom logger callback (Bunyan, Winston, Pino).
+-   **`handleUnknownErrors` Option** – Optionally catch non-Kit errors and return a structured 500 response.
+-   **Graceful Fallbacks** – Passes unformatted errors to the next handler by default.
 
 ## Table of Content
 
 -   [Installation](#installation)
 -   [Usage](#usage)
+-   [Options](#options)
 -   [How It Works](#how-it-works)
 -   [Why Use @wthek/restify-middleware?](#why-use-wthekrestify-middleware)
 -   [Explore More WTHek Extensions](#explore-more-wthek-extensions)
@@ -48,13 +53,13 @@ npm install @wthek/restify-middleware
 
 ## Usage
 
-**Add Middleware Just Before Starting the Server**
+**Add Error Handler on `restifyError`**
 
-To catch all errors correctly, place `KitRestifyMiddleware()` after all routes but before starting your Restify server.
+To catch all errors correctly, attach `KitRestifyMiddleware()` to the `restifyError` event on your Restify server.
 
-```Javascript
+```javascript
 import restify from 'restify';
-import { KitHttpError, BadRequestError } from "http-error-kit";
+import { KitHttpError } from "http-error-kit";
 import { KitRestifyMiddleware } from "@wthek/restify-middleware";
 
 const server = restify.createServer();
@@ -63,10 +68,10 @@ server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser());
 
 server.get('/test', (req, res, next) => {
-  return next(new KitHttpError('This is a bad request', { statusCode: 400 }));
+  return next(new KitHttpError(400, "Bad Request"));
 });
 
-// Error handler
+// Centralized error handler
 server.on('restifyError', KitRestifyMiddleware());
 
 server.listen(3000, () => {
@@ -74,18 +79,64 @@ server.listen(3000, () => {
 });
 ```
 
+**With Options**
+
+```javascript
+import restify from 'restify';
+import { KitRestifyMiddleware } from "@wthek/restify-middleware";
+
+const server = restify.createServer();
+
+server.on(
+  'restifyError',
+  KitRestifyMiddleware({
+    log: true,                // Logs errors via console.error
+    handleUnknownErrors: true // Returns structured 500 for non-Kit errors
+  })
+);
+```
+
+**Custom Logger**
+
+```javascript
+import restify from 'restify';
+import { KitRestifyMiddleware } from "@wthek/restify-middleware";
+
+const server = restify.createServer();
+
+server.on(
+  'restifyError',
+  KitRestifyMiddleware({
+    log: (error, req) => {
+      // Custom logger callback (e.g. Bunyan, Winston, Pino)
+      req.log ? req.log.error(error) : console.error(error);
+    }
+  })
+);
+```
+
+## Options
+
+| Option                | Type                                    | Default | Description                                                                                                                             |
+| --------------------- | --------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `log`                 | `boolean \| ((error, req) => void)`     | `false` | When `true`, logs via `console.error`. When a function, uses your custom callback.                                                      |
+| `handleUnknownErrors` | `boolean`                               | `false` | When `true`, returns a structured `{ statusCode: 500, message: "Internal Server Error" }` for non-Kit errors instead of forwarding raw errors. |
+
 ## How It Works
 
--   Catches errors thrown in routes and middleware
--   Checks if the error is an instance of any `http-error-kit` Errors
--   Formats the error response and sets the correct HTTP status code
--   Passes other errors to the next middleware (_so they can be handled separately_)
+-   Catches errors emitted or passed through Restify route handlers via `server.on('restifyError', ...)`.
+-   Checks `res.headersSent` to prevent `ERR_HTTP_HEADERS_SENT` crashes.
+-   Checks if the error is an instance of `KitHttpError` or `KitGeneralError`.
+-   Formats the error response with `error.toJSON()` and sets the matching HTTP status code.
+-   If `handleUnknownErrors` is enabled, formats unrecognized errors into structured 500 responses.
+-   Delegates to `next()` to continue Restify's handler lifecycle.
 
 ## Why Use `@wthek/restify-middleware`?
 
--   **No more manual error handling** – Status codes are automatically set.
--   **Consistent API responses** – Standardized errors improve debugging & logging.
+-   **No more manual error handling** – Status codes and payloads are automatically set.
+-   **Consistent API responses** – Standardized JSON errors improve debugging and client-side handling.
 -   **Works perfectly with `http-error-kit`** – Fully compatible with existing `http-error-kit` error structures.
+-   **Production-safe** – Response guards prevent double-send crashes and structured fallbacks protect against leaking raw stack traces.
 
 ## Explore More WTHek Extensions
 
@@ -109,9 +160,11 @@ The original author of the project is [Himanshu Bansal][skillnter]
 
 You can also use the following:
 
-![BTC: qzqmpxux3m56qqhz465u8022q9z63w2sysq4u9ltwj](https://img.shields.io/badge/BTC-qzqmpxux3m56qqhz465u8022q9z63w2sysq4u9ltwj-brightgreen)
+![BTC: bc1p22h4nsad5d8ketyhuvf0vyva6unttxwzzqvkty5r839as0mlclgs72d3mf](https://img.shields.io/badge/BTC-bc1p22h4nsad5d8ketyhuvf0vyva6unttxwzzqvkty5r839as0mlclgs72d3mf-brightgreen)
 
 ![ETH: 0x1D59a291391a3CE17C63D5dC50F258Dc0Ab62889](https://img.shields.io/badge/ETH-0x1D59a291391a3CE17C63D5dC50F258Dc0Ab62889-brightgreen)
+
+![BNB: 0x1D59a291391a3CE17C63D5dC50F258Dc0Ab62889](https://img.shields.io/badge/BNB-0x1D59a291391a3CE17C63D5dC50F258Dc0Ab62889-brightgreen)
 
 ## License
 
