@@ -14,8 +14,8 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f672583cdb534cfd8eb16b71249ba35c)](https://app.codacy.com/gh/Skillnter/wthek-restify-middleware/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 ![npms.io (final)](https://img.shields.io/npms-io/maintenance-score/%40wthek%2Frestify-middleware?color=brightgreen)
 ![npm](https://img.shields.io/npm/dy/%40wthek%2Frestify-middleware)
-![npm bundle size (version)](https://img.shields.io/bundlephobia/minzip/%40wthek%2Frestify-middleware/1.1.0)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/restify-middleware/1.1.0)](https://socket.dev/npm/package/@wthek/restify-middleware/overview/1.1.0)
+![npm bundle size (version)](https://img.shields.io/bundlephobia/minzip/%40wthek%2Frestify-middleware/1.2.0)
+[![Socket Badge](https://socket.dev/api/badge/npm/package/@wthek/restify-middleware/1.2.0)](https://socket.dev/npm/package/@wthek/restify-middleware/overview/1.2.0)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-121013?logo=github&logoColor=white)](https://skillnter.github.io/wthek-restify-middleware/)
 [![Github Sponsors](https://img.shields.io/badge/GitHub%20Sponsors-30363D?&logo=GitHub-Sponsors&logoColor=EA4AAA)](https://github.com/sponsors/Skillnter)
 [![Open Collective](https://img.shields.io/badge/Open%20Collective-3385FF?logo=open-collective&logoColor=white)](https://opencollective.com/skillnter)
@@ -40,6 +40,7 @@ _Built for applications powered by [http-error-kit][http-error-kit], this middle
 -   [Options](#options)
 -   [How It Works](#how-it-works)
 -   [Why Use @wthek/restify-middleware?](#why-use-wthekrestify-middleware)
+-   [AI Agent Integration](#ai-agent-integration)
 -   [Explore More WTHek Extensions](#explore-more-wthek-extensions)
 -   [People](#people)
 -   [Donations](#donations)
@@ -137,6 +138,17 @@ server.on(
 -   **Consistent API responses** – Standardized JSON errors improve debugging and client-side handling.
 -   **Works perfectly with `http-error-kit`** – Fully compatible with existing `http-error-kit` error structures.
 -   **Production-safe** – Response guards prevent double-send crashes and structured fallbacks protect against leaking raw stack traces.
+
+## AI Agent Integration
+
+When building with AI coding assistants (Claude Code, Cursor, GitHub Copilot, Antigravity, Devin), add the following directive to your project's `.cursorrules`, `.github/copilot-instructions.md`, or system prompt:
+
+```markdown
+### Restify Error Handling Rule
+- Always throw or forward semantic error classes from `http-error-kit` (e.g., `BadRequestError`, `NotFoundError`, `UnauthorizedError`) inside Restify route handlers via `return next(err)`.
+- In Restify server setup, attach `@wthek/restify-middleware`: `server.on("restifyError", KitRestifyMiddleware({ handleUnknownErrors: true }))`.
+- For validation errors, use companion transformers (e.g., `@wthek/zod-transformer`, `@wthek/valibot-transformer`).
+```
 
 ## Explore More WTHek Extensions
 

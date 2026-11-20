@@ -4,6 +4,14 @@ import { INTERNAL_SERVER_ERROR } from "http-response-status-code";
 
 /**
  * Configuration options for KitRestifyMiddleware.
+ *
+ * @example
+ * ```typescript
+ * const options: IKitRestifyMiddlewareOptions = {
+ *     log: true,
+ *     handleUnknownErrors: true,
+ * };
+ * ```
  */
 export interface IKitRestifyMiddlewareOptions {
     /**
