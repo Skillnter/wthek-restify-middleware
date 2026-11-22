@@ -1,0 +1,49 @@
+# @wthek/restify-middleware
+
+> Production-safe Restify error-handling middleware for `http-error-kit`.
+
+## Overview
+`@wthek/restify-middleware` catches `KitHttpError` and `KitGeneralError` instances in Restify applications and automatically responds with the matching HTTP status code and structured JSON error payload. It protects against `ERR_HTTP_HEADERS_SENT` crashes via `res.headersSent` checks, supports custom logger functions, and provides optional fallback handling for unknown exceptions.
+
+## Installation
+```bash
+npm install @wthek/restify-middleware http-error-kit http-response-status-code
+```
+
+## Quick Start
+```typescript
+import restify from "restify";
+import { KitRestifyMiddleware } from "@wthek/restify-middleware";
+import { BadRequestError, NotFoundError } from "http-error-kit";
+
+const server = restify.createServer();
+
+// Attach middleware to restifyError event
+server.on("restifyError", KitRestifyMiddleware({ log: true, handleUnknownErrors: true }));
+
+server.get("/api/users/:id", (req, res, next) => {
+  if (!req.params.id) {
+    return next(new BadRequestError("User ID is required"));
+  }
+  return next(new NotFoundError("User not found"));
+});
+
+server.listen(8080);
+```
+
+## API Reference
+
+### `KitRestifyMiddleware(options?: IKitRestifyMiddlewareOptions)`
+Returns a Restify error handler: `(req: Request, res: Response, error: unknown, next: Next) => void`.
+
+#### Options (`IKitRestifyMiddlewareOptions`)
+- `log` (`boolean | ((error: unknown, req: Request) => void)`, default: `false`):
+  When `true`, logs via `console.error`. When a function is provided, calls custom logger callback.
+- `handleUnknownErrors` (`boolean`, default: `false`):
+  When `true`, catches non-Kit errors and returns a structured 500 JSON response instead of passing raw errors to the next handler.
+
+## Safety Rules for AI Agents
+1. Attach `server.on("restifyError", KitRestifyMiddleware(...))` during Restify server setup.
+2. In route handlers, pass error instances to `next(err)`: `return next(new NotFoundError("Not found"))`.
+3. Throwing synchronously in Restify also triggers the `restifyError` event when wrapped by Restify's router.
+
